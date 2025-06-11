@@ -1,19 +1,25 @@
 #!/bin/bash
 
-#SBATCH --job-name=testlightning
+#SBATCH --job-name=llm
 #SBATCH --output=results/llm-%4j.out
 #SBATCH --error=results/llm-%4j.err
-#SBATCH --ntasks=2 
-#SBATCH --ntasks-per-gpu=1
+#SBATCH --nodes=2 
+#SBATCH --cpus-per-task=64
+#SBATCH --gpus-per-node=8
 #SBATCH --mem=0
-#SBATCH --cpus-per-gpu=16
 
 source .venv/bin/activate
 source .envrc
 export MLFLOW_EXPERIMENT_NAME=llm-finetune
+export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+export NCCL_DEBUG=WARN
+export NCCL_IB_DISABLE=0
+#export NCCL_SOCKET_IFNAME=eth0 
+
 
 #srun python3 llm.py
 srun ./wrapper.sh llm.py
+
 #  # Print hello from one node
 #  srun bash -c 'echo "Hello from $(hostname)"'
 #  
