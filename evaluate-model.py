@@ -10,7 +10,7 @@ from rouge_score import rouge_scorer
 def main(args):
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("-q", "--quiet", action="store_false", dest="verbose",
+    parser.add_argument("-q", "--quiet", action="store_true",
                         help="don't print status messages to stdout")
     parser.add_argument("model_name")
     parser.add_argument("-n", "--samples", default=100, type=int)

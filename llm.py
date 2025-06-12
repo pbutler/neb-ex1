@@ -68,7 +68,7 @@ with accelerator.main_process_first():
 def main(args):
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("-q", "--quiet", action="store_false", dest="verbose",
+    parser.add_argument("-q", "--quiet", action="store_true",
                         help="don't print status messages to stdout")
     parser.add_argument("--model_name", default="meta-llama/Llama-3.1-8B-Instruct")
     parser.add_argument("-s", "--save", default=100, type=int, help="samples to save for eval")
