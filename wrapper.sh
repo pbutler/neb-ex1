@@ -1,7 +1,6 @@
 #!/bin/bash
 
 export GPUS_PER_NODE=8
-export MLPERF_SLURM_FIRSTNODE="$(scontrol show hostnames "${SLURM_JOB_NODELIST-}" | head -n1)"
 head_node_ip=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 
 export MLFLOW_SYSTEM_METRICS_NODE_ID=node_$SLURM_NODEID
