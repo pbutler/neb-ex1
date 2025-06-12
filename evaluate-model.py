@@ -37,8 +37,6 @@ def main(args):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("-q", "--quiet", action="store_false", dest="verbose",
                         help="don't print status messages to stdout")
-    parser.add_argument("--version", action="version",
-                        version="%(prog)s " + __version__)
     parser.add_argument("model_name")
     parser.add_argument("-n", "--samples", default=100, type=int)
     parser.add_argument("--dataset_name", default="Salesforce/xlam-function-calling-60k")

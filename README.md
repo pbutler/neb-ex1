@@ -2,9 +2,10 @@
 
 ## Instructions
 1) setup a 2node x8 H100 GPU cluster
-2) set variables in `envrc.example` and change name to `.envrc`
-3) submit job via `sbatch llm.sh`
-4) run `model-evaluate.py` on before & after models
+2) `uv sync`
+3) set variables in `envrc.example` and change name to `.envrc`
+4) submit job via `sbatch llm.sh`
+5) run `model-evaluate.py` on before & after models
 
 ## Assumptions
 1) Went with small instruct model, good for reasoning + function calling
@@ -16,4 +17,8 @@
 1) Wierdness with saving the fsdp model, used some suggestions I found on a 
    github bug report having to do w/ stat dict sharding
 2) Not 100% infiniband is working, benchmarks say yes, speed of model? no
-3)
+3) Git commits are not pretty
+
+
+## Todo
+1) More documentation

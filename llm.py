@@ -98,8 +98,6 @@ def main(args):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("-q", "--quiet", action="store_false", dest="verbose",
                         help="don't print status messages to stdout")
-    parser.add_argument("--version", action="version",
-                        version="%(prog)s " + __version__)
     parser.add_argument("--model_name", default="meta-llama/Llama-3.1-8B-Instruct")
     parser.add_argument("-s", "--save", default=100, type=int, help="samples to save for eval")
     parser.add_argument("-e", "--epochs", default=5, type=int, help="epochs to run for")
