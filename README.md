@@ -18,6 +18,7 @@
    github bug report having to do w/ stat dict sharding
 2) Not 100% infiniband is working, benchmarks say yes, speed of model? no
 3) Git commits are not pretty
+4) Rouge score is not the best metric but it's a standin
 
 
 ## Todo
