@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import json
 import multiprocessing as mp
 import os
@@ -104,6 +105,7 @@ def main(args):
     #save the first $s$ for eval
     dataset = full_dataset.select(range(options.save, 60000))
 
+    # show an example encoded and decoded text
     if not options.quiet and accelerator.is_main_process:
         print(json.dumps(dataset[0], indent=2))
 
@@ -195,6 +197,7 @@ def main(args):
     accelerator.wait_for_everyone() 
 
     accelerator.print("Saving model")
+    #according to github there is a bug with sharded state dicts
     if accelerator.state.fsdp_plugin is not None:
         accelerator.state.fsdp_plugin.set_state_dict_type("FULL_STATE_DICT")
     accelerator.wait_for_everyone()
