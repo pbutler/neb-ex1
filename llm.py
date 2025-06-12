@@ -21,18 +21,18 @@ except ImportError:
     flash_attn = "sdpa"
 
 mlflow.config.enable_system_metrics_logging()
-mlflow.config.set_system_metrics_node_id(os.environ["SLURM_NODEID"])
-mlflow.autolog()
+try: #if running under SLURM TORCHRUN 
+    mlflow.config.set_system_metrics_node_id(os.environ["SLURM_NODEID"])
 
-device_string = PartialState().process_index
-
-try:
-    print("{}".format(os.environ["SLURM_NODEID"]))
+    print("{}".format(os.environ.get("SLURM_NODEID", "NONE")))
     print("Local: {}/{}".format(os.environ["LOCAL_RANK"], os.environ["LOCAL_WORLD_SIZE"]), end=" ")
     print("Global: {}/{}".format(os.environ["RANK"], os.environ["WORLD_SIZE"]), end=" ")
     print("Node: {}/{}".format(os.environ["GROUP_RANK"], os.environ["GROUP_WORLD_SIZE"]))
-except:
+except: #Pass quietly through if not running under SLURM TORCHRUN # noqa
     pass
+
+mlflow.autolog()
+device_string = PartialState().process_index
 
 torch_dtype = torch.bfloat16
 max_seq_length = 1024     # Unsloth auto supports RoPE Scaling internally!
@@ -129,7 +129,7 @@ def main(args):
     model = AutoModelForCausalLM.from_pretrained(
         options.model_name,
         #torch_dtype=quant_storage_dtype,
-        attn_implementation = "flash_attention_2",
+        attn_implementation = flash_attn,
     )
     model.config.use_cache = False 
 
@@ -164,7 +164,7 @@ def main(args):
             save_only_model = False,          # Saves entire model, not only weights
             log_level="debug",
             dataset_text_field = "text",
-            dataset_num_proc = 12,
+            dataset_num_proc = mp.cpu_count(),
             # dataset_kwargs={
             #     "add_special_tokens": False,  # We template with special tokens
             #     "append_concat_token": False, # No need to add additional separator token
