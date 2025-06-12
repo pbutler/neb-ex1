@@ -33,16 +33,13 @@ try:
 except:
     pass
 
-
 torch_dtype = torch.bfloat16
 max_seq_length = 1024     # Unsloth auto supports RoPE Scaling internally!
-
 
 terminators = [
     tokenizer.eos_token_id,
     #tokenizer.convert_tokens_to_ids("<|eot_id|>")
 ]
-    
 
 quantization_config = BitsAndBytesConfig(
         load_in_4bit=True,
@@ -66,31 +63,6 @@ with accelerator.main_process_first():
 #     map_eos_token = True,        # Maps <|im_end|> to <|eot_id|> instead
 # )
 
-def formatting_prompts_func(examples):
-    convos = []
-    prompts = []
-    
-    # Iterate through each item in the batch (examples are structured as lists of values)
-    for query, tools, answers in zip(examples['query'], examples['tools'], examples['answers']):
-        tool_user = {
-            "content": f"You are a helpful assistant with access to the following tools or function calls. Your task is to produce a sequence of tools or function calls necessary to generate response to the user utterance. Use the following tools or function calls as required:\n{tools}",
-            "role": "system"
-        }
-        ques_user = {
-            "content": f"{query}",
-            "role": "user"
-        }
-        assistant = {
-            "content": f"{answers}",
-            "role": "assistant"
-        }
-        convos.append([tool_user, ques_user, assistant])
-        prompts.append([tool_user, ques_user])
-
-    texts = [tokenizer.apply_chat_template(convo, tokenize=False, add_generation_prompt=False) for convo in convos ]
-    prompts = [tokenizer.apply_chat_template(convo, tokenize=False, add_generation_prompt=False) for convo in prompts ]
-    #texts = [tokenizer.apply_chat_template(convo, add_generation_prompt=True) for convo in convos]
-    return {"text": texts, "prompt": prompts}
 
 
 def main(args):
@@ -121,6 +93,32 @@ def main(args):
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
+    def formatting_prompts_func(examples):
+        convos = []
+        prompts = []
+        
+        # Iterate through each item in the batch (examples are structured as lists of values)
+        for query, tools, answers in zip(examples['query'], examples['tools'], examples['answers']):
+            tool_user = {
+                "content": f"You are a helpful assistant with access to the following tools or function calls. Your task is to produce a sequence of tools or function calls necessary to generate response to the user utterance. Use the following tools or function calls as required:\n{tools}",
+                "role": "system"
+            }
+            ques_user = {
+                "content": f"{query}",
+                "role": "user"
+            }
+            assistant = {
+                "content": f"{answers}",
+                "role": "assistant"
+            }
+            convos.append([tool_user, ques_user, assistant])
+            prompts.append([tool_user, ques_user])
+
+        texts = [tokenizer.apply_chat_template(convo, tokenize=False, add_generation_prompt=False) for convo in convos ]
+        prompts = [tokenizer.apply_chat_template(convo, tokenize=False, add_generation_prompt=False) for convo in prompts ]
+        #texts = [tokenizer.apply_chat_template(convo, add_generation_prompt=True) for convo in convos]
+        return {"text": texts, "prompt": prompts}
+
     if not options.quiet and accelerator.is_main_process:
         print(json.dumps(dataset[0], indent=2))
 
@@ -130,7 +128,6 @@ def main(args):
 
         print("Encoded:", encoded_input)
         print("Decoded:", decoded_output)
-
 
     #Model
     print(f"Starting to load the model {model_name} into memory")

@@ -5,31 +5,6 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndB
 import datasets as ds
 from rouge_score import rouge_scorer
 
-def formatting_prompts_func(examples):
-    convos = []
-    prompts = []
-
-    # Iterate through each item in the batch (examples are structured as lists of values)
-    for query, tools, answers in zip(examples['query'], examples['tools'], examples['answers']):
-        tool_user = {
-            "content": f"You are a helpful assistant with access to the following tools or function calls. Your task is toproduce a sequence of tools or function calls necessary to generate response to the user utterance. Use the following tools or function calls as required:\n{tools}",
-            "role": "system"
-        }
-        ques_user = {
-            "content": f"{query}",
-            "role": "user"
-        }
-        assistant = {
-            "content": f"{answers}",
-            "role": "assistant"
-        }
-        convos.append([tool_user, ques_user, assistant])
-        prompts.append([tool_user, ques_user])
-
-    texts = [tokenizer.apply_chat_template(convo, tokenize=False, add_generation_prompt=False) for convo in convos ]
-    prompts = [tokenizer.apply_chat_template(convo, tokenize=False, add_generation_prompt=False) for convo in prompts ]
-    #texts = [tokenizer.apply_chat_template(convo, add_generation_prompt=True) for convo in convos]
-    return {"text": texts, "prompt": prompts}
 
 
 def main(args):
@@ -42,6 +17,32 @@ def main(args):
     parser.add_argument("--dataset_name", default="Salesforce/xlam-function-calling-60k")
     options = parser.parse_args()
 
+    def formatting_prompts_func(examples):
+        convos = []
+        prompts = []
+
+        # Iterate through each item in the batch (examples are structured as lists of values)
+        for query, tools, answers in zip(examples['query'], examples['tools'], examples['answers']):
+            tool_user = {
+                "content": f"You are a helpful assistant with access to the following tools or function calls. Your task is toproduce a sequence of tools or function calls necessary to generate response to the user utterance. Use the following tools or function calls as required:\n{tools}",
+                "role": "system"
+            }
+            ques_user = {
+                "content": f"{query}",
+                "role": "user"
+            }
+            assistant = {
+                "content": f"{answers}",
+                "role": "assistant"
+            }
+            convos.append([tool_user, ques_user, assistant])
+            prompts.append([tool_user, ques_user])
+
+        texts = [tokenizer.apply_chat_template(convo, tokenize=False, add_generation_prompt=False) for convo in convos]
+        prompts = [tokenizer.apply_chat_template(convo, tokenize=False, add_generation_prompt=False) for convo in prompts]
+        #texts = [tokenizer.apply_chat_template(convo, add_generation_prompt=True) for convo in convos]
+        return {"text": texts, "prompt": prompts}
+
     tokenizer = AutoTokenizer.from_pretrained(options.model_name)
     full_dataset = ds.load_dataset(options.dataset_name, split="train")  #, token=hf_token)
     dataset = full_dataset.select(range(options.samples))
@@ -53,7 +54,7 @@ def main(args):
     scorer = rouge_scorer.RougeScorer(['rougeL'], use_stemmer=False)
 
     scores = []
-    for i in len(dataset):
+    for i in range(len(dataset)):
         if not options.quiet:
             print(dataset[i]["prompt"])
 
