@@ -229,7 +229,6 @@ dependencies = [
 wheels = [
     { url = "https://files.pythonhosted.org/packages/70/39/aa68b7bd28b091a96795be18810b2325ce9263ba8db087f6f196a663f03a/bitsandbytes-0.46.0-py3-none-manylinux_2_24_aarch64.whl", hash = "sha256:010709b56c85b0355f47fefbb37fe9058e8b18b9bf275bd576c5bd95a0d14d0c", size = 25533201, upload-time = "2025-05-27T21:25:27.601Z" },
     { url = "https://files.pythonhosted.org/packages/72/27/ec6ee3408e09e01ab05db07af5a97dc76db7bc18824cf5f5dbc98e1e08a4/bitsandbytes-0.46.0-py3-none-manylinux_2_24_x86_64.whl", hash = "sha256:ef38883cfd26f36a0dfff1715f620f87cee3813431f33e10e9658205160cb89b", size = 67047276, upload-time = "2025-05-27T21:25:31.299Z" },
-    { url = "https://files.pythonhosted.org/packages/f3/06/2ef5f6b28d8fa442c670b5acc1eb09dd57d4edb00b435b35529c3f09936c/bitsandbytes-0.46.0-py3-none-win_amd64.whl", hash = "sha256:121820a6df80ae3b7e361f7ef193279c3204c361a7e21eb43b5ffa7293403979", size = 66452401, upload-time = "2025-05-27T21:25:35.552Z" },
 ]
 
 [[package]]
@@ -673,11 +672,11 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "accelerate" },
-    { name = "bitsandbytes" },
+    { name = "bitsandbytes", marker = "sys_platform == 'linux'" },
     { name = "deepspeed" },
     { name = "evaluate" },
     { name = "fastai" },
-    { name = "flash-attn" },
+    { name = "flash-attn", marker = "sys_platform == 'linux'" },
     { name = "ipython", version = "8.37.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "ipython", version = "9.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "lightning" },
@@ -688,18 +687,18 @@ dependencies = [
     { name = "rouge-score" },
     { name = "torch" },
     { name = "transformers" },
-    { name = "triton" },
+    { name = "triton", marker = "sys_platform == 'linux'" },
     { name = "trl" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "accelerate", specifier = ">=1.7.0" },
-    { name = "bitsandbytes", specifier = ">=0.46.0" },
+    { name = "bitsandbytes", marker = "sys_platform == 'linux'", specifier = ">=0.46.0" },
     { name = "deepspeed", specifier = ">=0.17.0" },
     { name = "evaluate", specifier = ">=0.4.3" },
     { name = "fastai", specifier = ">=2.8.2" },
-    { name = "flash-attn", specifier = ">=2.7.4.post1" },
+    { name = "flash-attn", marker = "sys_platform == 'linux'", specifier = ">=2.0.2" },
     { name = "ipython", specifier = ">=8.37.0" },
     { name = "lightning", specifier = ">=2.5.1.post0" },
     { name = "mlflow", specifier = ">=2.22.1" },
@@ -709,7 +708,7 @@ requires-dist = [
     { name = "rouge-score", specifier = ">=0.1.2" },
     { name = "torch", specifier = ">=2.7.0" },
     { name = "transformers", specifier = ">=4.52.4" },
-    { name = "triton", specifier = ">=3.3.0" },
+    { name = "triton", marker = "sys_platform == 'linux'", specifier = ">=3.3.0" },
     { name = "trl", specifier = ">=0.18.1" },
 ]
 
