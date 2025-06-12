@@ -36,24 +36,13 @@ except:
 torch_dtype = torch.bfloat16
 max_seq_length = 1024     # Unsloth auto supports RoPE Scaling internally!
 
-terminators = [
-    tokenizer.eos_token_id,
-    #tokenizer.convert_tokens_to_ids("<|eot_id|>")
-]
-
-quantization_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch_dtype,
-        bnb_4bit_quant_storage=quant_storage_dtype,
-    )
-
-#model = accelerator.prepare(model)
-#testprompt(test_prompt, test_answer, tokenizer, model)
-
-with accelerator.main_process_first():
-    dataset = ds.load_dataset("Salesforce/xlam-function-calling-60k", split="train")  #, token=hf_token)
+#quantization_config = BitsAndBytesConfig(
+#        load_in_4bit=True,
+#        bnb_4bit_use_double_quant=True,
+#        bnb_4bit_quant_type="nf4",
+#        bnb_4bit_compute_dtype=torch_dtype,
+#        bnb_4bit_quant_storage=quant_storage_dtype,
+#    )
 
 # # Initialize the tokenizer with the chat template and mapping
 # tokenizer = get_chat_template(
@@ -80,13 +69,7 @@ def main(args):
     accelerator = Accelerator(log_with="mlflow")
     accelerator.init_trackers("llm-finetune", config={})
 
-    with accelerator.main_process_first():
-    # Apply the formatting on dataset
-        full_dataset = full_dataset.map(formatting_prompts_func, batched = True).select_columns(["text"])  
-        full_dataset = full_dataset.select_columns(["text"])  #remove_columns(["tools", "query", "answers"])
 
-    #save the first $s$ for eval
-    dataset = full_dataset.select(range(options.save, 60000))
 
     tokenizer = AutoTokenizer.from_pretrained(options.model_name, use_fast=True)
     tokenizer.padding_side = 'right'
@@ -119,6 +102,17 @@ def main(args):
         #texts = [tokenizer.apply_chat_template(convo, add_generation_prompt=True) for convo in convos]
         return {"text": texts, "prompt": prompts}
 
+    with accelerator.main_process_first():
+        full_dataset = ds.load_dataset("Salesforce/xlam-function-calling-60k", split="train")  #, token=hf_token)
+
+    with accelerator.main_process_first():
+    # Apply the formatting on dataset
+        full_dataset = full_dataset.map(formatting_prompts_func, batched = True).select_columns(["text"])  
+        full_dataset = full_dataset.select_columns(["text"])  #remove_columns(["tools", "query", "answers"])
+
+    #save the first $s$ for eval
+    dataset = full_dataset.select(range(options.save, 60000))
+
     if not options.quiet and accelerator.is_main_process:
         print(json.dumps(dataset[0], indent=2))
 
@@ -130,10 +124,10 @@ def main(args):
         print("Decoded:", decoded_output)
 
     #Model
-    print(f"Starting to load the model {model_name} into memory")
+    print(f"Starting to load the model {options.model_name} into memory")
     model = AutoModelForCausalLM.from_pretrained(
-        model_name,
-        torch_dtype=quant_storage_dtype,
+        options.model_name,
+        #torch_dtype=quant_storage_dtype,
         attn_implementation = "flash_attention_2",
     )
     model.config.use_cache = False 

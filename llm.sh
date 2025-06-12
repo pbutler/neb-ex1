@@ -13,4 +13,4 @@ source .envrc
 export MLFLOW_EXPERIMENT_NAME=llm-finetune
 
 #srun python3 llm.py
-srun ./wrapper.sh llm.py
+srun ./wrapper.sh llm.py -e 1
