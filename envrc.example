@@ -1,0 +1,9 @@
+export MLFLOW_TRACKING_URI=
+export MLFLOW_TRACKING_SERVER_CERT_PATH=ca.pem
+export MLFLOW_TRACKING_USERNAME=admin
+export MLFLOW_TRACKING_PASSWORD
+export MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING=true
+
+export HF_TOKEN=
+# optional
+#export HF_HOME=/mnt/data/cache
