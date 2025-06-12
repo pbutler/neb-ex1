@@ -1,23 +1,24 @@
-
-import os
-import multiprocessing as mp
 import json
+import multiprocessing as mp
+import os
 
-#from unsloth import FastLanguageModel
-#from unsloth.chat_templates import get_chat_template
-#from unsloth import unsloth_train
-import mlflow
-import torch
-
-import huggingface_hub as hfh
-from huggingface_hub import login
 import datasets as ds
-from transformers import TrainingArguments
-from trl import SFTTrainer, SFTConfig
-from accelerate import Accelerator, PartialState
-from accelerate import utils, tracking
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
-from peft import LoraConfig, get_peft_model
+import mlflow.config
+import torch
+from accelerate import Accelerator
+from accelerate import PartialState
+from peft import LoraConfig
+from transformers import AutoModelForCausalLM
+from transformers import AutoTokenizer
+from trl import SFTConfig
+from trl import SFTTrainer
+
+try:
+    import flash_attn
+    flash_attn = "flash_attention_2"
+except ImportError:
+    print("Flash Attention not installed, using default attention implementation.")
+    flash_attn = "sdpa"
 
 mlflow.config.enable_system_metrics_logging()
 mlflow.config.set_system_metrics_node_id(os.environ["SLURM_NODEID"])
