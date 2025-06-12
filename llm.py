@@ -15,16 +15,21 @@ import datasets as ds
 from transformers import TrainingArguments
 from trl import SFTTrainer, SFTConfig
 from accelerate import Accelerator, PartialState
+from accelerate import utils, tracking
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
 from peft import LoraConfig, get_peft_model
 
 mlflow.config.enable_system_metrics_logging()
 mlflow.config.set_system_metrics_node_id(os.environ["SLURM_NODEID"])
-accelerator = Accelerator()
+mlflow.autolog()
+
+accelerator = Accelerator(log_with="mlflow")
+accelerator.init_trackers("llm-finetune", config={})
 
 device_string = PartialState().process_index
 
 try:
+    print("{}".format(os.environ["SLURM_NODEID"]))
     print("Local: {}/{}".format(os.environ["LOCAL_RANK"], os.environ["LOCAL_WORLD_SIZE"]), end=" ")
     print("Global: {}/{}".format(os.environ["RANK"], os.environ["WORLD_SIZE"]), end=" ")
     print("Node: {}/{}".format(os.environ["GROUP_RANK"], os.environ["GROUP_WORLD_SIZE"]))
