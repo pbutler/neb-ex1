@@ -12,3 +12,4 @@ wheels/
 .envrc
 results*/
 demoday-test
+.mlruns
