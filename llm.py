@@ -45,16 +45,6 @@ max_seq_length = 1024     # Unsloth auto supports RoPE Scaling internally!
 #        bnb_4bit_quant_storage=quant_storage_dtype,
 #    )
 
-# # Initialize the tokenizer with the chat template and mapping
-# tokenizer = get_chat_template(
-#     tokenizer,
-#     chat_template = "llama-3", 
-#     mapping = {"role" : "from", "content" : "value", "user" : "human", "assistant" : "gpt"}, # ShareGPT style
-#     map_eos_token = True,        # Maps <|im_end|> to <|eot_id|> instead
-# )
-
-
-
 def main(args):
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
@@ -173,16 +163,16 @@ def main(args):
             packing = False,        # Can make training 5x faster for short sequences.
         )
 
-    # LoRA config based on QLoRA paper & Sebastian Raschka experiment
-    peft_config = LoraConfig(
-        lora_alpha=8,
-        lora_dropout=0.05,
-        r=16,
-        bias="none",
-        target_modules="all-linear",
-        task_type="CAUSAL_LM",
-        modules_to_save = ["lm_head", "embed_tokens"] # add if you want to use the Llama 3 instruct template
-    )
+    # # LoRA config based on QLoRA paper & Sebastian Raschka experiment
+    # peft_config = LoraConfig(
+    #     lora_alpha=8,
+    #     lora_dropout=0.05,
+    #     r=16,
+    #     bias="none",
+    #     target_modules="all-linear",
+    #     task_type="CAUSAL_LM",
+    #     modules_to_save = ["lm_head", "embed_tokens"] # add if you want to use the Llama 3 instruct template
+    # )
 
     #model = get_peft_model(model, peft_config)
 
@@ -203,6 +193,7 @@ def main(args):
     print(f"{round(trainer_stats.metrics['train_runtime']/60, 2)} minutes used for training.")
 
     accelerator.wait_for_everyone() 
+
     accelerator.print("Saving model")
     if accelerator.state.fsdp_plugin is not None:
         accelerator.state.fsdp_plugin.set_state_dict_type("FULL_STATE_DICT")
