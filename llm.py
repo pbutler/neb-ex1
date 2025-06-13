@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import importlib.util
 import json
 import multiprocessing as mp
 import os
@@ -14,12 +15,12 @@ from trl import SFTConfig
 from trl import SFTTrainer
 #from peft import LoraConfig
 
-try:
-    import flash_attn
-    flash_attn = "flash_attention_2"
-except ImportError:
+# check if flash attention is installed...
+if importlib.util.find_spec("flash_attn"):
+    attn_method = "flash_attention_2"
+else:
     print("Flash Attention not installed, using default attention implementation.")
-    flash_attn = "sdpa"
+    attn_method = "sdpa"
 
 mlflow.config.enable_system_metrics_logging()
 try: #if running under SLURM TORCHRUN 
@@ -121,7 +122,7 @@ def main(args):
     model = AutoModelForCausalLM.from_pretrained(
         options.model_name,
         #torch_dtype=quant_storage_dtype,
-        attn_implementation = flash_attn,
+        attn_implementation = attn_method,
     )
     model.config.use_cache = False 
 
