@@ -8,11 +8,11 @@ import mlflow.config
 import torch
 from accelerate import Accelerator
 from accelerate import PartialState
-from peft import LoraConfig
 from transformers import AutoModelForCausalLM
 from transformers import AutoTokenizer
 from trl import SFTConfig
 from trl import SFTTrainer
+#from peft import LoraConfig
 
 try:
     import flash_attn
