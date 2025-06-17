@@ -16,8 +16,23 @@
 
 7. submit jobs via `sbatch llm.sh` (you may choose to change the # of epochs
    to run for by modifying the `-e` option)
-    a. Check on runs via the mlflow public endpoint
-8. run `model-evaluate.py` on before & after models.
+
+    ```
+    usage: llm.py [-h] [-q] [--model_name MODEL_NAME] [-s SAVE] [-e EPOCHS] [--dataset_name DATASET_NAME] [--output OUTPUT]
+
+    options:
+      -h, --help            show this help message and exit
+      -q, --quiet           don't print status messages to stdout
+      --model_name MODEL_NAME
+      -s SAVE, --save SAVE  samples to save for eval
+      -e EPOCHS, --epochs EPOCHS
+                            epochs to run for
+      --dataset_name DATASET_NAME
+      --output OUTPUT       model output dir
+    ```
+
+8. Check on runs via the mlflow public endpoint.
+9. run `model-evaluate.py` on before & after models.
 
 ## Assumptions
 
