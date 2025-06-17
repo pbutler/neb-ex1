@@ -3,6 +3,7 @@
 ## Instructions
 
 1. Setup a 2xnode 8xH100 GPU cluster: [instructions](./infrastructure/README.md)
+    a. Setup an mlflow managed cluster, for monitoring and recording runs
 2. On built cluster, clone this repository.
 3. Install [uv](https://github.com/astral-sh/uv)
 4. Run `uv sync` in this directory
@@ -15,6 +16,7 @@
 
 7. submit jobs via `sbatch llm.sh` (you may choose to change the # of epochs
    to run for by modifying the `-e` option)
+    a. Check on runs via the mlflow public endpoint
 8. run `model-evaluate.py` on before & after models.
 
 ## Assumptions
