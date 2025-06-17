@@ -70,6 +70,13 @@ def main(args):
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
     def formatting_prompts_func(examples):
+        """
+        Format prompts from the dataset adds a text column with the full 
+        conversation and a prompt column with the user query and tools.
+
+        :param examples: dataset, which is a dictionary with keys 
+        'query', 'tools', and 'answers'.
+        """
         convos = []
         prompts = []
         
@@ -87,7 +94,9 @@ def main(args):
                 "content": f"{answers}",
                 "role": "assistant"
             }
+            #convos is the fullconversation: prompt + answer
             convos.append([tool_user, ques_user, assistant])
+            #prompts is the prompt only: prompt
             prompts.append([tool_user, ques_user])
 
         texts = [tokenizer.apply_chat_template(convo, tokenize=False, add_generation_prompt=False) for convo in convos ]
@@ -95,18 +104,20 @@ def main(args):
         #texts = [tokenizer.apply_chat_template(convo, add_generation_prompt=True) for convo in convos]
         return {"text": texts, "prompt": prompts}
 
+    # Load the dataset
     with accelerator.main_process_first():
         full_dataset = ds.load_dataset("Salesforce/xlam-function-calling-60k", split="train")  #, token=hf_token)
 
+    # Format dataset, select only full text columns
     with accelerator.main_process_first():
     # Apply the formatting on dataset
         full_dataset = full_dataset.map(formatting_prompts_func, batched = True).select_columns(["text"])  
         full_dataset = full_dataset.select_columns(["text"])  #remove_columns(["tools", "query", "answers"])
 
-    #save the first $s$ for eval
+    #save the first options.save samples for eval
     dataset = full_dataset.select(range(options.save, 60000))
 
-    # show an example encoded and decoded text
+    # show an example encoded and decoded text to confirm tokenizer works
     if not options.quiet and accelerator.is_main_process:
         print(json.dumps(dataset[0], indent=2))
 
@@ -149,7 +160,7 @@ def main(args):
             lr_scheduler_type = "linear",     # Chooses a linear learning rate decay
             seed = 31415,                        
             output_dir = "outputs",             
-            report_to = "mlflow",              # Enables Weights & Biases (W&B) logging
+            report_to = "mlflow",              # Enables mlflow logging
             logging_steps = 50,                # Sets frequency of logging to W&
             logging_strategy = "steps",       # Logs metrics at each specified step
             save_strategy = "no",               
@@ -179,6 +190,7 @@ def main(args):
 
     #model = get_peft_model(model, peft_config)
 
+    # Initialize the SFTTrainer with the model, tokenizer, and dataset
     trainer = SFTTrainer(
         model = model,
         processing_class = tokenizer,
