@@ -7,6 +7,13 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
+[manifest]
+
+[[manifest.dependency-metadata]]
+name = "flash-attn"
+version = "2.7.4"
+requires-dist = ["torch", "einops"]
+
 [[package]]
 name = "absl-py"
 version = "2.3.0"
@@ -676,7 +683,6 @@ dependencies = [
     { name = "deepspeed" },
     { name = "evaluate" },
     { name = "fastai" },
-    { name = "flash-attn", marker = "sys_platform == 'linux'" },
     { name = "ipython", version = "8.37.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "ipython", version = "9.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "lightning" },
@@ -691,6 +697,16 @@ dependencies = [
     { name = "trl" },
 ]
 
+[package.optional-dependencies]
+build = [
+    { name = "packaging" },
+    { name = "setuptools" },
+    { name = "torch" },
+]
+compile = [
+    { name = "flash-attn" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "accelerate", specifier = ">=1.7.0" },
@@ -698,19 +714,23 @@ requires-dist = [
     { name = "deepspeed", specifier = ">=0.17.0" },
     { name = "evaluate", specifier = ">=0.4.3" },
     { name = "fastai", specifier = ">=2.8.2" },
-    { name = "flash-attn", marker = "sys_platform == 'linux'", specifier = ">=2.0.2" },
+    { name = "flash-attn", marker = "extra == 'compile'" },
     { name = "ipython", specifier = ">=8.37.0" },
     { name = "lightning", specifier = ">=2.5.1.post0" },
     { name = "mlflow", specifier = ">=2.22.1" },
+    { name = "packaging", marker = "extra == 'build'" },
     { name = "peft", specifier = ">=0.15.2" },
     { name = "psutil", specifier = ">=7.0.0" },
     { name = "pynvml", specifier = ">=12.0.0" },
     { name = "rouge-score", specifier = ">=0.1.2" },
+    { name = "setuptools", marker = "extra == 'build'" },
     { name = "torch", specifier = ">=2.7.0" },
+    { name = "torch", marker = "extra == 'build'" },
     { name = "transformers", specifier = ">=4.52.4" },
     { name = "triton", marker = "sys_platform == 'linux'", specifier = ">=3.3.0" },
     { name = "trl", specifier = ">=0.18.1" },
 ]
+provides-extras = ["build", "compile"]
 
 [[package]]
 name = "exceptiongroup"
